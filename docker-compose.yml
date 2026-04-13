@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: taskflow_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: taskflow
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    container_name: taskflow_backend
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/taskflow?sslmode=disable
+      JWT_SECRET: supersecret123
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    container_name: taskflow_frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
